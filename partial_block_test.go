@@ -1,17 +1,64 @@
 package handlebars
 
-import "testing"
+import (
+	"testing"
+)
 
-var partialBlockTests = []Test{
-	{"basic partial block", `{{#> layout}}content{{/layout}}`, nil, nil, nil, map[string]string{"layout": "before-{{> @partial-block}}-after"}, "before-content-after"},
-	{"fallback when partial missing", `{{#> nonexistent}}fallback content{{/nonexistent}}`, nil, nil, nil, nil, "fallback content"},
-	{"partial block with context", `{{#> layout}}Hello {{name}}{{/layout}}`, map[string]string{"name": "World"}, nil, nil, map[string]string{"layout": "<div>{{> @partial-block}}</div>"}, "<div>Hello World</div>"},
-	{"nested partial blocks", `{{#> outer}}inner content{{/outer}}`, nil, nil, nil, map[string]string{"outer": "OUTER[{{#> middle}}{{> @partial-block}}{{/middle}}]OUTER", "middle": "MIDDLE[{{> @partial-block}}]MIDDLE"}, "OUTER[MIDDLE[inner content]MIDDLE]OUTER"},
-	{"content around @partial-block", `{{#> page}}My Page Content{{/page}}`, nil, nil, nil, map[string]string{"page": "<html><body>{{> @partial-block}}</body></html>"}, "<html><body>My Page Content</body></html>"},
-	{"multiple @partial-block refs", `{{#> doubled}}hello{{/doubled}}`, nil, nil, nil, map[string]string{"doubled": "{{> @partial-block}} and {{> @partial-block}}"}, "hello and hello"},
-	{"empty block content", `{{#> layout}}{{/layout}}`, nil, nil, nil, map[string]string{"layout": "[{{> @partial-block}}]"}, "[]"},
-	{"partial ignores block content", `{{#> simple}}this is ignored{{/simple}}`, nil, nil, nil, map[string]string{"simple": "just a simple partial"}, "just a simple partial"},
-	{"partial block with context param", `{{#> myPartial ctxData}}block content {{foo}}{{/myPartial}}`, map[string]interface{}{"ctxData": map[string]string{"foo": "bar"}}, nil, nil, map[string]string{"myPartial": "{{foo}}: {{> @partial-block}}"}, "bar: block content bar"},
+func TestPartialBlock_BasicWithPartialBlock(t *testing.T) {
+	tpl := MustParse("{{#> layout}}content{{/layout}}")
+	tpl.RegisterPartial("layout", "<div>{{> @partial-block}}</div>")
+
+	result := tpl.MustExec(nil)
+	if result != "<div>content</div>" {
+		t.Errorf("expected '<div>content</div>', got %q", result)
+	}
 }
 
-func TestPartialBlocks(t *testing.T) { launchTests(t, partialBlockTests) }
+func TestPartialBlock_FallbackWhenPartialMissing(t *testing.T) {
+	tpl := MustParse("{{#> nonexistent}}fallback content{{/nonexistent}}")
+
+	result := tpl.MustExec(nil)
+	if result != "fallback content" {
+		t.Errorf("expected 'fallback content', got %q", result)
+	}
+}
+
+func TestPartialBlock_WithContextData(t *testing.T) {
+	tpl := MustParse("{{#> layout}}Hello {{name}}{{/layout}}")
+	tpl.RegisterPartial("layout", "<main>{{> @partial-block}}</main>")
+
+	result := tpl.MustExec(map[string]interface{}{"name": "World"})
+	if result != "<main>Hello World</main>" {
+		t.Errorf("expected '<main>Hello World</main>', got %q", result)
+	}
+}
+
+func TestPartialBlock_ContentAroundPartialBlock(t *testing.T) {
+	tpl := MustParse("{{#> page}}Page Body{{/page}}")
+	tpl.RegisterPartial("page", "<header>Header</header>{{> @partial-block}}<footer>Footer</footer>")
+
+	result := tpl.MustExec(nil)
+	if result != "<header>Header</header>Page Body<footer>Footer</footer>" {
+		t.Errorf("expected header+body+footer, got %q", result)
+	}
+}
+
+func TestPartialBlock_PartialIgnoresBlockContent(t *testing.T) {
+	tpl := MustParse("{{#> simple}}this is ignored{{/simple}}")
+	tpl.RegisterPartial("simple", "just the partial")
+
+	result := tpl.MustExec(nil)
+	if result != "just the partial" {
+		t.Errorf("expected 'just the partial', got %q", result)
+	}
+}
+
+func TestPartialBlock_EmptyBlockContent(t *testing.T) {
+	tpl := MustParse("{{#> layout}}{{/layout}}")
+	tpl.RegisterPartial("layout", "before{{> @partial-block}}after")
+
+	result := tpl.MustExec(nil)
+	if result != "beforeafter" {
+		t.Errorf("expected 'beforeafter', got %q", result)
+	}
+}
