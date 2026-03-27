@@ -35,6 +35,7 @@ func init() {
 	RegisterHelper("log", logHelper)
 	RegisterHelper("lookup", lookupHelper)
 	RegisterHelper("equal", equalHelper)
+	RegisterHelper("raw", rawHelper)
 }
 
 // RegisterHelper registers a global helper. That helper will be available to all templates.
@@ -393,6 +394,12 @@ func logHelper(message string) interface{} {
 // #lookup helper
 func lookupHelper(obj interface{}, field string, options *Options) interface{} {
 	return Str(options.Eval(obj, field))
+}
+
+// #raw helper — used by raw blocks ({{{{raw}}}}...{{{{/raw}}}})
+// Returns block content as-is without processing Handlebars expressions.
+func rawHelper(options *Options) interface{} {
+	return options.Fn()
 }
 
 // #equal helper
