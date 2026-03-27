@@ -238,6 +238,23 @@ func errRecover(errp *error) {
 	}
 }
 
+// AST returns the parsed AST program for this template.
+// The returned pointer is shared with the template — modifications
+// to the AST will affect template execution.
+func (tpl *Template) AST() *ast.Program {
+	return tpl.program
+}
+
+// NewTemplateFromAST creates a new template from a pre-parsed AST program.
+// This allows constructing templates from programmatically built or modified ASTs.
+func NewTemplateFromAST(program *ast.Program) *Template {
+	return &Template{
+		program:  program,
+		helpers:  make(map[string]reflect.Value),
+		partials: make(map[string]*partial),
+	}
+}
+
 // PrintAST returns string representation of parsed template.
 func (tpl *Template) PrintAST() string {
 	if err := tpl.parse(); err != nil {
