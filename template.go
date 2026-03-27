@@ -18,6 +18,7 @@ type Template struct {
 	helpers  map[string]reflect.Value
 	partials map[string]*partial
 	mutex    sync.RWMutex // protects helpers and partials
+	strict   bool         // strict mode: error on missing fields
 }
 
 // newTemplate instanciate a new template without parsing it
@@ -94,6 +95,12 @@ func (tpl *Template) Clone() *Template {
 	}
 
 	return result
+}
+
+// SetStrict enables or disables strict mode. In strict mode, accessing
+// missing fields causes an error instead of returning an empty string.
+func (tpl *Template) SetStrict(strict bool) {
+	tpl.strict = strict
 }
 
 func (tpl *Template) findHelper(name string) reflect.Value {

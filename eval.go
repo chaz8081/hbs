@@ -45,6 +45,9 @@ type evalVisitor struct {
 
 	inlinePartials map[string]*partial
 
+	// strict mode: error on missing fields
+	strict bool
+
 	// used for info on panic
 	curNode ast.Node
 }
@@ -63,6 +66,7 @@ func newEvalVisitor(tpl *Template, ctx interface{}, privData *DataFrame) *evalVi
 		ctx:       []reflect.Value{reflect.ValueOf(ctx)},
 		dataFrame: frame,
 		exprFunc:       make(map[*ast.Expression]bool),
+		strict:         tpl.strict,
 		inlinePartials: make(map[string]*partial),
 	}
 }
@@ -352,6 +356,11 @@ func (v *evalVisitor) evalField(ctx reflect.Value, fieldName string, exprRoot bo
 	result, _ = indirect(result)
 	if result.Kind() == reflect.Func {
 		result = v.evalFieldFunc(fieldName, result, exprRoot)
+	}
+
+	// strict mode: error on missing fields
+	if !result.IsValid() && v.strict && exprRoot {
+		v.errorf("Missing field: %s", fieldName)
 	}
 
 	return result
