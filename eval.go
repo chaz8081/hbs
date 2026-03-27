@@ -842,11 +842,18 @@ func (v *evalVisitor) VisitBlock(node *ast.BlockStatement) interface{} {
 	} else if expr == nil && !v.wasFuncCall(node.Expression) {
 		// Expression resolved to nil and not a function call - try blockHelperMissing
 		if blockHelperMissing := v.findHelper("blockHelperMissing"); blockHelperMissing != zero {
-			options := v.helperOptions(node.Expression)
-			options.name = node.Expression.Canonical()
-			retVal := v.callFunc("blockHelperMissing", blockHelperMissing, options)
-			if retVal.IsValid() {
-				result = retVal.Interface()
+			hmOptions := newOptions(v, nil, nil)
+			hmOptions.name = node.Expression.Canonical()
+			// expr may be nil, need to pass a valid reflect.Value
+			var ctxArg reflect.Value
+			if expr != nil {
+				ctxArg = reflect.ValueOf(expr)
+			} else {
+				ctxArg = reflect.ValueOf((*interface{})(nil))
+			}
+			retVal := blockHelperMissing.Call([]reflect.Value{ctxArg, reflect.ValueOf(hmOptions)})
+			if len(retVal) > 0 && retVal[0].IsValid() {
+				result = retVal[0].Interface()
 			}
 		} else if node.Inverse != nil {
 			result, _ = node.Inverse.Accept(v).(string)
@@ -991,11 +998,12 @@ func (v *evalVisitor) VisitExpression(node *ast.Expression) interface{} {
 		} else if len(node.Params) > 0 || node.Hash != nil {
 			// Expression has params/hash but no matching helper - try helperMissing
 			if helperMissing := v.findHelper("helperMissing"); helperMissing != zero {
-				options := v.helperOptions(node)
-				options.name = helperName
-				retVal := v.callFunc("helperMissing", helperMissing, options)
-				if retVal.IsValid() {
-					result = retVal.Interface()
+				origOptions := v.helperOptions(node)
+				hmOptions := newOptions(v, origOptions.params, origOptions.hash)
+				hmOptions.name = helperName
+				retVal := helperMissing.Call([]reflect.Value{reflect.ValueOf(hmOptions)})
+				if len(retVal) > 0 && retVal[0].IsValid() {
+					result = retVal[0].Interface()
 				}
 				done = true
 			}
