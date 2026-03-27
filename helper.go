@@ -15,6 +15,9 @@ type Options struct {
 	// params
 	params []interface{}
 	hash   map[string]interface{}
+
+	// name of the helper (used by helperMissing/blockHelperMissing)
+	name string
 }
 
 // helpers stores all globally registered helpers
@@ -110,6 +113,11 @@ func newEmptyOptions(eval *evalVisitor) *Options {
 		eval: eval,
 		hash: make(map[string]interface{}),
 	}
+}
+
+// Name returns the name of the helper that was called.
+func (options *Options) Name() string {
+	return options.name
 }
 
 //
