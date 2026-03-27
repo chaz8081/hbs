@@ -135,6 +135,9 @@ func (p *parser) parseStatement() ast.Node {
 	case lexer.TokenOpenPartial:
 		// partial
 		result = p.parsePartial()
+	case lexer.TokenOpenBlockPartial:
+		// block partial
+		result = p.parseBlockPartial()
 	case lexer.TokenOpenDecoratorBlock:
 		// decorator block (inline partial)
 		result = p.parseDecoratorBlock()
@@ -158,7 +161,7 @@ func (p *parser) isStatement() bool {
 	switch p.next().Kind {
 	case lexer.TokenOpen, lexer.TokenOpenUnescaped, lexer.TokenOpenBlock,
 		lexer.TokenOpenInverse, lexer.TokenOpenRawBlock, lexer.TokenOpenPartial,
-		lexer.TokenOpenDecoratorBlock, lexer.TokenContent, lexer.TokenComment:
+		lexer.TokenOpenBlockPartial, lexer.TokenOpenDecoratorBlock, lexer.TokenContent, lexer.TokenComment:
 		return true
 	}
 
@@ -517,6 +520,40 @@ func (p *parser) parsePartial() *ast.PartialStatement {
 
 	result.Strip = ast.NewStrip(tok.Val, tokClose.Val)
 
+	return result
+}
+
+
+// parseBlockPartial parses {{#> partialName param* hash?}}...{{/partialName}}
+func (p *parser) parseBlockPartial() *ast.PartialStatement {
+	tok := p.shift()
+	result := ast.NewPartialStatement(tok.Pos, tok.Line)
+	result.Name = p.parsePartialName()
+	result.Params, result.Hash = p.parseExpressionParamsHash()
+	tokClose := p.shift()
+	if tokClose.Kind != lexer.TokenClose {
+		errExpected(lexer.TokenClose, tokClose)
+	}
+	result.Strip = ast.NewStrip(tok.Val, tokClose.Val)
+	result.Program = p.parseProgram()
+	tokEnd := p.shift()
+	if tokEnd.Kind != lexer.TokenOpenEndBlock {
+		errExpected(lexer.TokenOpenEndBlock, tokEnd)
+	}
+	endID := p.parseHelperName()
+	closeName, ok := ast.HelperNameStr(endID)
+	if !ok {
+		errNode(endID, "Erroneous closing expression")
+	}
+	openName, _ := ast.HelperNameStr(result.Name)
+	if openName != closeName {
+		errNode(endID, fmt.Sprintf("%s doesn't match %s", openName, closeName))
+	}
+	tokClose2 := p.shift()
+	if tokClose2.Kind != lexer.TokenClose {
+		errExpected(lexer.TokenClose, tokClose2)
+	}
+	result.CloseStrip = ast.NewStrip(tokEnd.Val, tokClose2.Val)
 	return result
 }
 

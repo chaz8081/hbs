@@ -34,6 +34,9 @@ type evalVisitor struct {
 	// block statements stack
 	blocks []*ast.BlockStatement
 
+	// partial block content stack
+	partialBlocks []*ast.Program
+
 	// expressions stack
 	exprs []*ast.Expression
 
@@ -836,6 +839,18 @@ func (v *evalVisitor) VisitBlock(node *ast.BlockStatement) interface{} {
 	if v.isHelperCall(node.Expression) || v.wasFuncCall(node.Expression) {
 		// it is the responsibility of the helper/function to evaluate block
 		result = expr
+	} else if expr == nil && !v.wasFuncCall(node.Expression) {
+		// Expression resolved to nil and not a function call - try blockHelperMissing
+		if blockHelperMissing := v.findHelper("blockHelperMissing"); blockHelperMissing != zero {
+			options := v.helperOptions(node.Expression)
+			options.name = node.Expression.Canonical()
+			retVal := v.callFunc("blockHelperMissing", blockHelperMissing, options)
+			if retVal.IsValid() {
+				result = retVal.Interface()
+			}
+		} else if node.Inverse != nil {
+			result, _ = node.Inverse.Accept(v).(string)
+		}
 	} else {
 		val := reflect.ValueOf(expr)
 
@@ -906,6 +921,33 @@ func (v *evalVisitor) VisitPartial(node *ast.PartialStatement) interface{} {
 		v.errorf("Unexpected partial name: %q", node.Name)
 	}
 
+	// Handle {{> @partial-block}}
+	if name == "@partial-block" {
+		if len(v.partialBlocks) > 0 {
+			block := v.partialBlocks[len(v.partialBlocks)-1]
+			if block != nil {
+				v.partialBlocks = v.partialBlocks[:len(v.partialBlocks)-1]
+				result, _ := block.Accept(v).(string)
+				v.partialBlocks = append(v.partialBlocks, block)
+				return indentLines(result, node.Indent)
+			}
+		}
+		return ""
+	}
+
+	// Block partial ({{#> name}}...{{/name}})
+	if node.Program != nil {
+		partial := v.findPartial(name)
+		if partial == nil {
+			result, _ := node.Program.Accept(v).(string)
+			return indentLines(result, node.Indent)
+		}
+		v.partialBlocks = append(v.partialBlocks, node.Program)
+		result := v.evalPartial(partial, node)
+		v.partialBlocks = v.partialBlocks[:len(v.partialBlocks)-1]
+		return result
+	}
+
 	partial := v.findPartial(name)
 	if partial == nil {
 		v.errorf("Partial not found: %s", name)
@@ -946,6 +988,17 @@ func (v *evalVisitor) VisitExpression(node *ast.Expression) interface{} {
 		if helper := v.findHelper(helperName); helper != zero {
 			result = v.callHelper(helperName, helper, node)
 			done = true
+		} else if len(node.Params) > 0 || node.Hash != nil {
+			// Expression has params/hash but no matching helper - try helperMissing
+			if helperMissing := v.findHelper("helperMissing"); helperMissing != zero {
+				options := v.helperOptions(node)
+				options.name = helperName
+				retVal := v.callFunc("helperMissing", helperMissing, options)
+				if retVal.IsValid() {
+					result = retVal.Interface()
+				}
+				done = true
+			}
 		}
 	}
 

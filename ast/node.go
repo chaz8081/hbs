@@ -275,9 +275,13 @@ type PartialStatement struct {
 	Params []Node // [ Expression ... ]
 	Hash   *Hash
 
+	// Program holds block content for partial blocks ({{#> name}}...{{/name}})
+	Program *Program
+
 	// whitespace management
-	Strip  *Strip
-	Indent string
+	Strip      *Strip
+	CloseStrip *Strip
+	Indent     string
 }
 
 // NewPartialStatement instanciates a new partial node.
