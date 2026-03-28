@@ -30,15 +30,7 @@ var helpers = make(map[string]reflect.Value)
 var helpersMutex sync.RWMutex
 
 func init() {
-	// register builtin helpers
-	RegisterHelper("if", ifHelper)
-	RegisterHelper("unless", unlessHelper)
-	RegisterHelper("with", withHelper)
-	RegisterHelper("each", eachHelper)
-	RegisterHelper("log", logHelper)
-	RegisterHelper("lookup", lookupHelper)
-	RegisterHelper("equal", equalHelper)
-	RegisterHelper("raw", rawHelper)
+	registerBuiltinHelpers()
 }
 
 // RegisterHelper registers a global helper. That helper will be available to all templates.
@@ -71,12 +63,35 @@ func RemoveHelper(name string) {
 	delete(helpers, name)
 }
 
-// RemoveAllHelpers unregisters all global helpers
+// RemoveAllHelpers unregisters all global helpers and re-registers built-in helpers.
 func RemoveAllHelpers() {
 	helpersMutex.Lock()
 	defer helpersMutex.Unlock()
 
 	helpers = make(map[string]reflect.Value)
+
+	// re-register built-in helpers
+	registerBuiltinHelpers()
+}
+
+// registerBuiltinHelpers registers all built-in helpers into the global helpers map.
+// Must be called with helpersMutex held.
+func registerBuiltinHelpers() {
+	builtins := map[string]interface{}{
+		"if":     ifHelper,
+		"unless": unlessHelper,
+		"with":   withHelper,
+		"each":   eachHelper,
+		"log":    logHelper,
+		"lookup": lookupHelper,
+		"equal":  equalHelper,
+		"raw":    rawHelper,
+	}
+	for name, helper := range builtins {
+		val := reflect.ValueOf(helper)
+		ensureValidHelper(name, val)
+		helpers[name] = val
+	}
 }
 
 // ensureValidHelper panics if given helper is not valid
@@ -297,11 +312,23 @@ func (options *Options) Eval(ctx interface{}, field string) interface{} {
 // isIncludableZero returns true if 'includeZero' option is set and first param is the number 0
 func (options *Options) isIncludableZero() bool {
 	b, ok := options.HashProp("includeZero").(bool)
-	if ok && b {
-		nb, ok := options.Param(0).(int)
-		if ok && nb == 0 {
-			return true
-		}
+	if !ok || !b {
+		return false
+	}
+
+	param := options.Param(0)
+	if param == nil {
+		return false
+	}
+
+	v := reflect.ValueOf(param)
+	switch v.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return v.Int() == 0
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return v.Uint() == 0
+	case reflect.Float32, reflect.Float64:
+		return v.Float() == 0
 	}
 
 	return false

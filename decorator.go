@@ -118,12 +118,15 @@ func RemoveDecorator(name string) {
 	delete(decorators, name)
 }
 
-// RemoveAllDecorators unregisters all global decorators.
+// RemoveAllDecorators unregisters all global decorators and re-registers built-in decorators.
 func RemoveAllDecorators() {
 	decoratorsMutex.Lock()
 	defer decoratorsMutex.Unlock()
 
 	decorators = make(map[string]DecoratorFunc)
+
+	// re-register built-in decorators
+	decorators["inline"] = inlineDecoratorFn
 }
 
 // findGlobalDecorator finds a globally registered decorator.
