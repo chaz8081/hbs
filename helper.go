@@ -18,6 +18,9 @@ type Options struct {
 
 	// name of the helper (used by helperMissing/blockHelperMissing)
 	name string
+
+	// rawContent holds the literal content of a raw block, if applicable
+	rawContent string
 }
 
 // helpers stores all globally registered helpers
@@ -119,6 +122,12 @@ func newEmptyOptions(eval *evalVisitor) *Options {
 // Name returns the name of the helper that was called.
 func (options *Options) Name() string {
 	return options.name
+}
+
+// RawContent returns the literal content of a raw block ({{{{raw}}}}...{{{{/raw}}}}).
+// Returns an empty string if the helper was not invoked as a raw block.
+func (options *Options) RawContent() string {
+	return options.rawContent
 }
 
 //
@@ -386,14 +395,22 @@ func eachHelper(context interface{}, options *Options) interface{} {
 }
 
 // #log helper
-func logHelper(message string) interface{} {
-	log.Print(message)
+func logHelper(message string, options *Options) interface{} {
+	level := options.HashStr("level")
+	if level == "" {
+		level = "info"
+	}
+	log.Printf("[%s] %s", level, message)
 	return ""
 }
 
 // #lookup helper
 func lookupHelper(obj interface{}, field string, options *Options) interface{} {
-	return Str(options.Eval(obj, field))
+	result := options.Eval(obj, field)
+	if result == nil {
+		return ""
+	}
+	return result
 }
 
 // #raw helper — used by raw blocks ({{{{raw}}}}...{{{{/raw}}}})

@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/chaz8081/handlebars-go/v3/ast"
+	"github.com/chaz8081/handlebars-go/v4/ast"
 )
 
 var (
@@ -44,6 +44,9 @@ type evalVisitor struct {
 	exprFunc map[*ast.Expression]bool
 
 	inlinePartials map[string]*partial
+
+	// rawContent holds the literal content of the current raw block being evaluated
+	curRawContent string
 
 	// strict mode: error on missing fields
 	strict bool
@@ -688,7 +691,9 @@ func (v *evalVisitor) helperOptions(node *ast.Expression) *Options {
 		hash, _ = node.Hash.Accept(v).(map[string]interface{})
 	}
 
-	return newOptions(v, params, hash)
+	opts := newOptions(v, params, hash)
+	opts.rawContent = v.curRawContent
+	return opts
 }
 
 //
@@ -840,10 +845,18 @@ func (v *evalVisitor) VisitBlock(node *ast.BlockStatement) interface{} {
 	}
 	v.pushBlock(node)
 
+	// set raw content for raw block helpers
+	if node.RawContent != "" {
+		v.curRawContent = node.RawContent
+	}
+
 	var result interface{}
 
 	// evaluate expression
 	expr := node.Expression.Accept(v)
+
+	// clear raw content after expression evaluation
+	v.curRawContent = ""
 
 	if v.isHelperCall(node.Expression) || v.wasFuncCall(node.Expression) {
 		// it is the responsibility of the helper/function to evaluate block
@@ -902,24 +915,50 @@ func (v *evalVisitor) VisitBlock(node *ast.BlockStatement) interface{} {
 	return result
 }
 
-// VisitPartial implements corresponding Visitor interface method
+// visitDecoratorBlock dispatches decorator blocks to registered decorator functions.
 func (v *evalVisitor) visitDecoratorBlock(node *ast.BlockStatement) interface{} {
 	helperName := node.Expression.HelperName()
-	if helperName != "inline" {
-		v.errorf("Unsupported decorator: %s", helperName)
+
+	// find registered decorator (template-level first, then global)
+	decorator := v.tpl.findDecorator(helperName)
+	if decorator == nil {
+		decorator = findGlobalDecorator(helperName)
 	}
-	if len(node.Expression.Params) != 1 {
-		v.errorf("inline decorator requires exactly one argument (the partial name)")
+	if decorator == nil {
+		v.errorf("Unknown decorator: %s", helperName)
 	}
-	name, ok := node.Expression.Params[0].Accept(v).(string)
-	if !ok || name == "" {
-		v.errorf("inline decorator argument must be a string")
+
+	// evaluate params
+	var params []interface{}
+	for _, paramNode := range node.Expression.Params {
+		params = append(params, paramNode.Accept(v))
 	}
+
+	// evaluate hash
+	var hash map[string]interface{}
+	if node.Expression.Hash != nil {
+		hash, _ = node.Expression.Hash.Accept(v).(map[string]interface{})
+	}
+
+	// build decorator options
+	opts := &DecoratorOptions{
+		eval:       v,
+		params:     params,
+		hash:       hash,
+		name:       helperName,
+		astProgram: node.Program,
+	}
+
+	// set program function for Fn()
 	if node.Program != nil {
-		tpl := NewTemplateFromAST(node.Program)
-		v.inlinePartials[name] = newPartial(name, "", tpl)
+		program := node.Program
+		opts.program = func() string {
+			result, _ := program.Accept(v).(string)
+			return result
+		}
 	}
-	return ""
+
+	return decorator(opts)
 }
 
 func (v *evalVisitor) VisitPartial(node *ast.PartialStatement) interface{} {
