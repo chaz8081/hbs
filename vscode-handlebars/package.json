@@ -1,0 +1,81 @@
+{
+  "name": "handlebars-go",
+  "displayName": "Handlebars (Go)",
+  "description": "Handlebars template support for Go projects using chaz8081/handlebars-go",
+  "version": "0.1.0",
+  "publisher": "chaz8081",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Snippets"
+  ],
+  "activationEvents": [
+    "onLanguage:handlebars"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "handlebars",
+        "aliases": [
+          "Handlebars",
+          "hbs"
+        ],
+        "extensions": [
+          ".hbs",
+          ".handlebars"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "handlebars",
+        "scopeName": "text.html.handlebars",
+        "path": "./syntaxes/handlebars.tmLanguage.json"
+      }
+    ],
+    "configuration": {
+      "title": "Handlebars (Go)",
+      "properties": {
+        "handlebarsGo.lintOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Run handlebars-lint on save"
+        },
+        "handlebarsGo.lintBinary": {
+          "type": "string",
+          "default": "",
+          "description": "Path to handlebars-lint binary (auto-detected if empty)"
+        },
+        "handlebarsGo.dataFile": {
+          "type": "string",
+          "default": "",
+          "description": "Path to JSON data file for validation"
+        },
+        "handlebarsGo.helpers": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "description": "List of known custom helper names"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/vscode": "^1.80.0",
+    "typescript": "^5.0.0"
+  }
+}

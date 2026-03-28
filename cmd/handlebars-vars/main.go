@@ -88,9 +88,15 @@ func main() {
 	}
 
 	if len(results) == 1 {
-		enc.Encode(results[0])
+		if err := enc.Encode(results[0]); err != nil {
+			fmt.Fprintf(os.Stderr, "Error encoding JSON output: %s\n", err)
+			os.Exit(1)
+		}
 	} else {
-		enc.Encode(results)
+		if err := enc.Encode(results); err != nil {
+			fmt.Fprintf(os.Stderr, "Error encoding JSON output: %s\n", err)
+			os.Exit(1)
+		}
 	}
 
 	if hasErrors {

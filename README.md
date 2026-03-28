@@ -43,7 +43,16 @@ Handlebars for [golang](https://golang.org) with the same features as [handlebar
   - [Dynamic Partials](#dynamic-partials)
   - [Partial Contexts](#partial-contexts)
   - [Partial Parameters](#partial-parameters)
+- [Decorators](#decorators)
+  - [Inline Partials](#inline-partials)
+  - [Custom Decorators](#custom-decorators)
+  - [Template Decorators](#template-decorators)
 - [Utility Functions](#utility-functions)
+- [CLI Tools](#cli-tools)
+  - [handlebars-lint](#handlebars-lint)
+  - [handlebars-vars](#handlebars-vars)
+  - [handlebars-gen](#handlebars-gen)
+- [VS Code Extension](#vs-code-extension)
 - [Mustache](#mustache)
 - [Limitations](#limitations)
 - [Handlebars Lexer](#handlebars-lexer)
@@ -649,7 +658,13 @@ The `log` helper allows for logging while rendering a template.
 {{log "Look at me!"}}
 ```
 
-Note that the handlebars.js `@level` variable is not supported.
+You can specify a log level with the `level` hash parameter:
+
+```html
+{{log "Something went wrong" level="warn"}}
+```
+
+Supported levels: `debug`, `info` (default), `warn`, `error`.
 
 
 #### The `equal` helper
@@ -1264,6 +1279,83 @@ My hero is Goldorak
 ```
 
 
+## Decorators
+
+Decorators allow you to modify the program execution at compile time. The most common use case is inline partials, which are built-in.
+
+### Inline Partials
+
+You can define partials inline within a template using the `{{#*inline}}` decorator:
+
+```html
+{{#*inline "myPartial"}}
+  <p>Hello {{name}}</p>
+{{/inline}}
+
+{{> myPartial}}
+```
+
+Inline partials are available to the current block and all child blocks. This allows templates to define partials that can be overridden by partial blocks:
+
+```html
+{{!-- layout.hbs --}}
+<div class="container">
+  {{> @partial-block}}
+</div>
+
+{{!-- page.hbs --}}
+{{#> layout}}
+  {{#*inline "sidebar"}}
+    <nav>Custom sidebar</nav>
+  {{/inline}}
+  <p>Main content</p>
+{{/layout}}
+```
+
+
+### Custom Decorators
+
+You can register custom decorators that run during template evaluation:
+
+```go
+handlebars.RegisterDecorator("bold", func(options *handlebars.DecoratorOptions) interface{} {
+    name := options.ParamStr(0)
+    format := options.HashStr("format")
+    // Decorators can modify execution context, register inline partials, etc.
+    return ""
+})
+```
+
+The `DecoratorOptions` provides:
+
+- `Param(index)` / `ParamStr(index)` - access positional parameters
+- `Params()` - all parameters
+- `Hash()` / `HashProp(key)` / `HashStr(key)` - access hash arguments
+- `Name()` - the decorator name
+- `Fn()` - evaluate the decorator block
+- `RegisterInlinePartial(name)` - register a partial from the block content
+
+You can unregister decorators:
+
+```go
+handlebars.RemoveDecorator("bold")
+handlebars.RemoveAllDecorators() // keeps built-in inline decorator
+```
+
+
+### Template Decorators
+
+You can register decorators on a specific template:
+
+```go
+tpl := handlebars.MustParse("{{*myDecorator}} content")
+tpl.RegisterDecorator("myDecorator", func(options *handlebars.DecoratorOptions) interface{} {
+    // Template-level decorators take priority over global ones
+    return ""
+})
+```
+
+
 ## Utility Functions
 
 You can use following utility fuctions to parse and register partials from files:
@@ -1271,6 +1363,113 @@ You can use following utility fuctions to parse and register partials from files
 - `ParseFile()` - reads a file and return parsed template
 - `Template.RegisterPartialFile()` - reads a file and registers its content as a partial with given name
 - `Template.RegisterPartialFiles()` - reads several files and registers them as partials, the filename base is used as the partial name
+
+
+## CLI Tools
+
+This module ships with three CLI tools for working with Handlebars templates in Go projects. Install them with:
+
+```sh
+go install github.com/chaz8081/handlebars-go/v4/cmd/handlebars-lint@latest
+go install github.com/chaz8081/handlebars-go/v4/cmd/handlebars-vars@latest
+go install github.com/chaz8081/handlebars-go/v4/cmd/handlebars-gen@latest
+```
+
+
+### handlebars-lint
+
+Validates Handlebars template files for syntax errors and optionally checks template variables against provided JSON data.
+
+```sh
+# Check all templates in a directory
+handlebars-lint templates/
+
+# Validate variables against JSON data
+handlebars-lint --data fixtures/data.json template.hbs
+
+# JSON output for CI pipelines
+handlebars-lint --json templates/**/*.hbs
+
+# Specify known helpers to avoid false positives
+handlebars-lint --helpers "formatDate,currency" template.hbs
+
+# Quiet mode — only show errors
+handlebars-lint --quiet templates/
+```
+
+Exit codes: `0` for success, `1` if any errors are found.
+
+
+### handlebars-vars
+
+Extracts all variables referenced in Handlebars template files and outputs structured JSON.
+
+```sh
+# Extract variables from a template
+handlebars-vars template.hbs
+
+# Only show required (unconditional) variables
+handlebars-vars --required-only template.hbs
+
+# Compact JSON output
+handlebars-vars --compact template.hbs
+
+# Exclude known helpers from results
+handlebars-vars --helpers "formatDate,currency" template.hbs
+```
+
+Output includes each variable's path, whether it's required, any conditions it appears under, and its source location.
+
+
+### handlebars-gen
+
+Generates Go struct definitions from Handlebars template files by analyzing variable usage patterns:
+
+- `{{name}}` infers a `string` field
+- `{{#if active}}` infers an `interface{}` field (boolean condition)
+- `{{#each items}}` infers a slice field with an element struct
+- `{{#with user}}` infers a nested struct field
+- `{{user.name}}` infers a nested struct with a string field
+
+```sh
+# Generate a struct from a template
+handlebars-gen --package myapp template.hbs
+
+# Specify the struct type name
+handlebars-gen --package myapp --type EmailData email.hbs
+
+# Process all templates in a directory and write to file
+handlebars-gen --package myapp --dir templates/ --output types_gen.go
+
+# Include a Validate() method for required field checking
+handlebars-gen --package myapp --validate template.hbs
+
+# Add handlebars struct tags alongside json tags
+handlebars-gen --package myapp --handlebars-tags template.hbs
+```
+
+This is useful for CI pipelines where templates live in one repo and you want to auto-generate the data contract struct in another repo.
+
+
+## VS Code Extension
+
+A VS Code extension is included in `vscode-handlebars/` providing:
+
+- **Syntax highlighting** for Handlebars expressions, block helpers, comments, partials, decorators, raw blocks, subexpressions, and data variables
+- **Autocomplete** with snippets for built-in helpers (`if`, `unless`, `each`, `with`, `lookup`, `log`) and `@data` variables
+- **Hover documentation** for built-in helpers
+- **Lint-on-save** integration with the `handlebars-lint` CLI
+- **Configurable** custom helpers list, data file for validation, and lint binary path
+
+To install for development:
+
+```sh
+cd vscode-handlebars
+npm install
+npm run compile
+```
+
+Then use "Install from VSIX" or symlink into your VS Code extensions directory. See GitHub issue [#2](https://github.com/chaz8081/handlebars-go/issues/2) for marketplace publishing plans.
 
 
 ## Mustache

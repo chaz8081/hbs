@@ -104,7 +104,7 @@ func RegisterDecorator(name string, decorator DecoratorFunc) {
 	defer decoratorsMutex.Unlock()
 
 	if _, exists := decorators[name]; exists {
-		panic(fmt.Errorf("Decorator already registered: %s", name))
+		panic(fmt.Errorf("decorator already registered: %s", name))
 	}
 
 	decorators[name] = decorator

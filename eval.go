@@ -65,9 +65,9 @@ func newEvalVisitor(tpl *Template, ctx interface{}, privData *DataFrame) *evalVi
 	}
 
 	return &evalVisitor{
-		tpl:       tpl,
-		ctx:       []reflect.Value{reflect.ValueOf(ctx)},
-		dataFrame: frame,
+		tpl:            tpl,
+		ctx:            []reflect.Value{reflect.ValueOf(ctx)},
+		dataFrame:      frame,
 		exprFunc:       make(map[*ast.Expression]bool),
 		strict:         tpl.strict,
 		inlinePartials: make(map[string]*partial),
