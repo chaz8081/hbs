@@ -1,9 +1,9 @@
-# handlebars
-[![Go Reference](https://pkg.go.dev/badge/github.com/flowchartsman/handlebars.svg)](https://pkg.go.dev/github.com/flowchartsman/handlebars/v4)
+# handlebars-go
+[![Go Reference](https://pkg.go.dev/badge/github.com/chaz8081/handlebars-go.svg)](https://pkg.go.dev/github.com/chaz8081/handlebars-go/v4)
 
-Handlebars for [golang](https://golang.org) with the same features as [handlebars.js](http://handlebarsjs.com) `4.0`. Hard fork of [Raymond](https://github.com/aymerick/raymond) to modularize and keep up with handlebars development.
+Handlebars for [golang](https://golang.org) with the same features as [handlebars.js](http://handlebarsjs.com) `4.0`. Hard fork of [flowchartsman/handlebars](https://github.com/flowchartsman/handlebars) (itself a fork of [Raymond](https://github.com/aymerick/raymond)) to keep up with handlebars development.
 
-![Handlebars Logo](https://github.com/flowchartsman/handlebars/blob/main/handlebars-gopher.png?raw=true "Handlebars")
+![Handlebars Logo](https://github.com/chaz8081/handlebars-go/blob/main/handlebars-gopher.png?raw=true "Handlebars")
 
 
 # Table of Contents
@@ -55,7 +55,7 @@ Handlebars for [golang](https://golang.org) with the same features as [handlebar
 
 ## Quick Start
 
-    $ go get github.com/flowchartsman/handlebars/v4
+    $ go get github.com/chaz8081/handlebars-go/v4
 
 The quick and dirty way of rendering a handlebars template:
 
@@ -65,7 +65,7 @@ package main
 import (
     "fmt"
 
-    "github.com/flowchartsman/handlebars/v4"
+    "github.com/chaz8081/handlebars-go/v4"
 )
 
 func main() {
@@ -115,7 +115,7 @@ package main
 import (
     "fmt"
 
-    "github.com/flowchartsman/handlebars/v4
+    "github.com/chaz8081/handlebars-go/v4
 )
 
 func main() {
@@ -199,7 +199,7 @@ package main
 import (
   "fmt"
 
-  "github.com/flowchartsman/handlebars/v4
+  "github.com/chaz8081/handlebars-go/v4
 )
 
 func main() {
@@ -1309,7 +1309,7 @@ package main
 import (
     "fmt"
 
-    "github.com/flowchartsman/handlebars/v4/lexer"
+    "github.com/chaz8081/handlebars-go/v4/lexer"
 )
 
 func main() {
@@ -1351,8 +1351,8 @@ package main
 import (
     "fmt"
 
-    "github.com/flowchartsman/handlebars/v4/ast"
-    "github.com/flowchartsman/handlebars/v4/parser"
+    "github.com/chaz8081/handlebars-go/v4/ast"
+    "github.com/chaz8081/handlebars-go/v4/parser"
 )
 
 fu  nc main() {
