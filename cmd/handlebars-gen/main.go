@@ -104,7 +104,11 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error creating output file: %s\n", err)
 			os.Exit(1)
 		}
-		defer w.Close()
+		defer func() {
+			if cerr := w.Close(); cerr != nil {
+				fmt.Fprintf(os.Stderr, "Error closing output file: %s\n", cerr)
+			}
+		}()
 	} else {
 		w = os.Stdout
 	}

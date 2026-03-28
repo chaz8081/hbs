@@ -1,0 +1,4 @@
+# CLI tool binaries (built at repo root)
+/handlebars-gen
+/handlebars-lint
+/handlebars-vars

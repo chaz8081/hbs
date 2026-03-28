@@ -52,9 +52,9 @@ func ExtractVariables(tpl *Template, helpers map[string]bool) []TemplateVar {
 // varExtractor walks the AST to collect template variables.
 type varExtractor struct {
 	helpers    map[string]bool
-	conditions []string         // stack of condition paths
+	conditions []string // stack of condition paths
 	seen       map[string]*TemplateVar
-	order      []string         // insertion order for deterministic output
+	order      []string // insertion order for deterministic output
 	source     string
 }
 

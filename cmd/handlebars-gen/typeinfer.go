@@ -19,16 +19,16 @@ const (
 
 // fieldInfo holds inferred info about a single field.
 type fieldInfo struct {
-	Name     string               // Go-friendly field name (e.g., "Name")
-	JSONName string               // original template name (e.g., "name")
-	Type     fieldType            // inferred type
-	Required bool                 // true if not inside conditional
+	Name     string                // Go-friendly field name (e.g., "Name")
+	JSONName string                // original template name (e.g., "name")
+	Type     fieldType             // inferred type
+	Required bool                  // true if not inside conditional
 	Children map[string]*fieldInfo // nested fields (for struct/slice element types)
 }
 
 // templateSchema is the top-level inferred schema for a template.
 type templateSchema struct {
-	TypeName string               // Go struct type name
+	TypeName string // Go struct type name
 	Fields   map[string]*fieldInfo
 }
 
@@ -54,8 +54,8 @@ type schemaWalker struct {
 	schema     *templateSchema
 	helpers    map[string]bool
 	current    map[string]*fieldInfo // current field scope
-	conditions int                    // depth of conditional nesting
-	depth      int                    // context depth (for ../ resolution)
+	conditions int                   // depth of conditional nesting
+	depth      int                   // context depth (for ../ resolution)
 }
 
 func (w *schemaWalker) isHelper(name string) bool {

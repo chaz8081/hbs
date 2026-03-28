@@ -22,13 +22,13 @@ import (
 )
 
 type lintResult struct {
-	File   string       `json:"file"`
-	Errors []lintError  `json:"errors"`
-	Valid  bool         `json:"valid"`
+	File   string      `json:"file"`
+	Errors []lintError `json:"errors"`
+	Valid  bool        `json:"valid"`
 }
 
 type lintError struct {
-	Type    string `json:"type"`    // "parse" or "validation"
+	Type    string `json:"type"` // "parse" or "validation"
 	Message string `json:"message"`
 	Path    string `json:"path,omitempty"` // field path for validation errors
 }
@@ -108,7 +108,10 @@ func main() {
 	if *jsonOutput {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
-		enc.Encode(results)
+		if err := enc.Encode(results); err != nil {
+			fmt.Fprintf(os.Stderr, "Error encoding JSON output: %s\n", err)
+			os.Exit(1)
+		}
 	} else {
 		for _, r := range results {
 			if len(r.Errors) == 0 {

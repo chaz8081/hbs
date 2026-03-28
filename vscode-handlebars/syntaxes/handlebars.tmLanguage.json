@@ -1,0 +1,217 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Handlebars",
+  "scopeName": "text.html.handlebars",
+  "patterns": [
+    { "include": "#raw-block" },
+    { "include": "#comment-block" },
+    { "include": "#comment-inline" },
+    { "include": "#block-helper" },
+    { "include": "#close-block" },
+    { "include": "#partial" },
+    { "include": "#decorator" },
+    { "include": "#unescaped-expression" },
+    { "include": "#expression" },
+    { "include": "text.html.basic" }
+  ],
+  "repository": {
+    "raw-block": {
+      "begin": "(\\{\\{\\{\\{)(\\w+)(\\}\\}\\}\\})",
+      "end": "(\\{\\{\\{\\{)/(\\2)(\\}\\}\\}\\})",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.handlebars" },
+        "2": { "name": "entity.name.tag.handlebars" },
+        "3": { "name": "punctuation.definition.tag.end.handlebars" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.handlebars" },
+        "2": { "name": "entity.name.tag.handlebars" },
+        "3": { "name": "punctuation.definition.tag.end.handlebars" }
+      },
+      "contentName": "string.unquoted.raw.handlebars"
+    },
+    "comment-block": {
+      "begin": "\\{\\{!--",
+      "end": "--\\}\\}",
+      "name": "comment.block.handlebars"
+    },
+    "comment-inline": {
+      "begin": "\\{\\{!",
+      "end": "\\}\\}",
+      "name": "comment.line.handlebars"
+    },
+    "block-helper": {
+      "begin": "(\\{\\{~?)(#|\\^)\\s*",
+      "end": "(~?\\}\\})",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.handlebars" },
+        "2": { "name": "keyword.operator.block.handlebars" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.end.handlebars" }
+      },
+      "patterns": [
+        { "include": "#helper-name" },
+        { "include": "#expression-contents" }
+      ]
+    },
+    "close-block": {
+      "begin": "(\\{\\{~?)/",
+      "end": "(~?\\}\\})",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.handlebars" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.end.handlebars" }
+      },
+      "patterns": [
+        {
+          "match": "\\w+",
+          "name": "entity.name.tag.handlebars"
+        }
+      ]
+    },
+    "partial": {
+      "begin": "(\\{\\{~?)>\\s*",
+      "end": "(~?\\}\\})",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.handlebars" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.end.handlebars" }
+      },
+      "patterns": [
+        {
+          "match": "[\\w./-]+",
+          "name": "entity.name.function.partial.handlebars"
+        },
+        { "include": "#expression-contents" }
+      ]
+    },
+    "decorator": {
+      "begin": "(\\{\\{~?)\\*\\s*",
+      "end": "(~?\\}\\})",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.handlebars" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.end.handlebars" }
+      },
+      "patterns": [
+        {
+          "match": "\\w+",
+          "name": "entity.name.function.decorator.handlebars"
+        },
+        { "include": "#expression-contents" }
+      ]
+    },
+    "unescaped-expression": {
+      "begin": "(\\{\\{\\{~?)",
+      "end": "(~?\\}\\}\\})",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.handlebars" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.end.handlebars" }
+      },
+      "patterns": [
+        { "include": "#expression-contents" }
+      ]
+    },
+    "expression": {
+      "begin": "(\\{\\{~?)",
+      "end": "(~?\\}\\})",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.handlebars" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.end.handlebars" }
+      },
+      "patterns": [
+        { "include": "#helper-name" },
+        { "include": "#expression-contents" }
+      ]
+    },
+    "helper-name": {
+      "match": "(?<=\\{\\{~?#?\\^?\\s*)(if|unless|each|with|lookup|log|else|raw)\\b",
+      "name": "keyword.control.handlebars"
+    },
+    "expression-contents": {
+      "patterns": [
+        { "include": "#string-double" },
+        { "include": "#string-single" },
+        { "include": "#number" },
+        { "include": "#boolean" },
+        { "include": "#subexpression" },
+        { "include": "#hash-pair" },
+        { "include": "#data-variable" },
+        { "include": "#path-expression" },
+        { "include": "#block-params" }
+      ]
+    },
+    "string-double": {
+      "begin": "\"",
+      "end": "\"",
+      "name": "string.quoted.double.handlebars",
+      "patterns": [
+        {
+          "match": "\\\\.",
+          "name": "constant.character.escape.handlebars"
+        }
+      ]
+    },
+    "string-single": {
+      "begin": "'",
+      "end": "'",
+      "name": "string.quoted.single.handlebars",
+      "patterns": [
+        {
+          "match": "\\\\.",
+          "name": "constant.character.escape.handlebars"
+        }
+      ]
+    },
+    "number": {
+      "match": "\\b\\d+(\\.\\d+)?\\b",
+      "name": "constant.numeric.handlebars"
+    },
+    "boolean": {
+      "match": "\\b(true|false|null|undefined)\\b",
+      "name": "constant.language.handlebars"
+    },
+    "subexpression": {
+      "begin": "\\(",
+      "end": "\\)",
+      "beginCaptures": {
+        "0": { "name": "punctuation.section.subexpression.begin.handlebars" }
+      },
+      "endCaptures": {
+        "0": { "name": "punctuation.section.subexpression.end.handlebars" }
+      },
+      "patterns": [
+        { "include": "#expression-contents" }
+      ]
+    },
+    "hash-pair": {
+      "match": "(\\w+)\\s*=",
+      "captures": {
+        "1": { "name": "variable.parameter.hash.handlebars" }
+      }
+    },
+    "data-variable": {
+      "match": "@(index|key|first|last|root|level)\\b",
+      "name": "variable.other.data.handlebars"
+    },
+    "path-expression": {
+      "match": "(\\.\\./)*[\\w][\\w./-]*",
+      "name": "variable.other.handlebars"
+    },
+    "block-params": {
+      "match": "\\b(as)\\s*\\|([^|]*)\\|",
+      "captures": {
+        "1": { "name": "keyword.operator.as.handlebars" },
+        "2": { "name": "variable.parameter.block.handlebars" }
+      }
+    }
+  }
+}
