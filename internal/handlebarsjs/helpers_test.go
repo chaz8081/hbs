@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/chaz8081/handlebars-go/v3"
+	"github.com/chaz8081/handlebars-go/v4"
 )
 
 //

@@ -7,8 +7,8 @@ import (
 	"runtime"
 	"strconv"
 
-	"github.com/chaz8081/handlebars-go/v3/ast"
-	"github.com/chaz8081/handlebars-go/v3/lexer"
+	"github.com/chaz8081/handlebars-go/v4/ast"
+	"github.com/chaz8081/handlebars-go/v4/lexer"
 )
 
 // References:
@@ -248,6 +248,9 @@ func (p *parser) parseRawBlock() *ast.BlockStatement {
 	// content
 	// @todo Is content mandatory in a raw block ?
 	content := p.parseContent()
+
+	// store raw content for passing to helper as parameter
+	result.RawContent = content.Value
 
 	program := ast.NewProgram(tok.Pos, tok.Line)
 	program.AddStatement(content)

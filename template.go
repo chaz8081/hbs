@@ -7,26 +7,28 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/chaz8081/handlebars-go/v3/ast"
-	"github.com/chaz8081/handlebars-go/v3/parser"
+	"github.com/chaz8081/handlebars-go/v4/ast"
+	"github.com/chaz8081/handlebars-go/v4/parser"
 )
 
 // Template represents a handlebars template.
 type Template struct {
-	source   string
-	program  *ast.Program
-	helpers  map[string]reflect.Value
-	partials map[string]*partial
-	mutex    sync.RWMutex // protects helpers and partials
-	strict   bool         // strict mode: error on missing fields
+	source     string
+	program    *ast.Program
+	helpers    map[string]reflect.Value
+	partials   map[string]*partial
+	decorators map[string]DecoratorFunc
+	mutex      sync.RWMutex // protects helpers, partials, and decorators
+	strict     bool         // strict mode: error on missing fields
 }
 
 // newTemplate instanciate a new template without parsing it
 func newTemplate(source string) *Template {
 	return &Template{
-		source:   source,
-		helpers:  make(map[string]reflect.Value),
-		partials: make(map[string]*partial),
+		source:     source,
+		helpers:    make(map[string]reflect.Value),
+		partials:   make(map[string]*partial),
+		decorators: make(map[string]DecoratorFunc),
 	}
 }
 
@@ -92,6 +94,10 @@ func (tpl *Template) Clone() *Template {
 
 	for name, partial := range tpl.partials {
 		result.addPartial(name, partial.source, partial.tpl)
+	}
+
+	for name, decorator := range tpl.decorators {
+		result.RegisterDecorator(name, decorator)
 	}
 
 	return result
@@ -196,6 +202,21 @@ func (tpl *Template) RegisterPartialTemplate(name string, template *Template) {
 	tpl.addPartial(name, "", template)
 }
 
+// RegisterDecorator registers a decorator for that template.
+func (tpl *Template) RegisterDecorator(name string, decorator DecoratorFunc) {
+	tpl.mutex.Lock()
+	defer tpl.mutex.Unlock()
+
+	tpl.decorators[name] = decorator
+}
+
+func (tpl *Template) findDecorator(name string) DecoratorFunc {
+	tpl.mutex.RLock()
+	defer tpl.mutex.RUnlock()
+
+	return tpl.decorators[name]
+}
+
 // Exec evaluates template with given context.
 func (tpl *Template) Exec(ctx interface{}) (result string, err error) {
 	return tpl.ExecWith(ctx, nil)
@@ -256,9 +277,10 @@ func (tpl *Template) AST() *ast.Program {
 // This allows constructing templates from programmatically built or modified ASTs.
 func NewTemplateFromAST(program *ast.Program) *Template {
 	return &Template{
-		program:  program,
-		helpers:  make(map[string]reflect.Value),
-		partials: make(map[string]*partial),
+		program:    program,
+		helpers:    make(map[string]reflect.Value),
+		partials:   make(map[string]*partial),
+		decorators: make(map[string]DecoratorFunc),
 	}
 }
 

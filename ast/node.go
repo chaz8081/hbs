@@ -238,6 +238,10 @@ type BlockStatement struct {
 	// Decorator is true when this block is a decorator (e.g. {{#*inline "name"}}...{{/inline}})
 	Decorator bool
 
+	// RawContent holds the literal content of a raw block ({{{{raw}}}}...{{{{/raw}}}})
+	// This is passed as a parameter to the raw block helper.
+	RawContent string
+
 	// whitespace management
 	OpenStrip    *Strip
 	InverseStrip *Strip

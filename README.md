@@ -1,7 +1,7 @@
 # handlebars
-[![Go Reference](https://pkg.go.dev/badge/github.com/flowchartsman/handlebars.svg)](https://pkg.go.dev/github.com/flowchartsman/handlebars/v3)
+[![Go Reference](https://pkg.go.dev/badge/github.com/flowchartsman/handlebars.svg)](https://pkg.go.dev/github.com/flowchartsman/handlebars/v4)
 
-Handlebars for [golang](https://golang.org) with the same features as [handlebars.js](http://handlebarsjs.com) `3.0`. Hard fork of [Raymond](https://github.com/aymerick/raymond) to modularize and keep up with handlebars development.
+Handlebars for [golang](https://golang.org) with the same features as [handlebars.js](http://handlebarsjs.com) `4.0`. Hard fork of [Raymond](https://github.com/aymerick/raymond) to modularize and keep up with handlebars development.
 
 ![Handlebars Logo](https://github.com/flowchartsman/handlebars/blob/main/handlebars-gopher.png?raw=true "Handlebars")
 
@@ -55,7 +55,7 @@ Handlebars for [golang](https://golang.org) with the same features as [handlebar
 
 ## Quick Start
 
-    $ go get github.com/flowchartsman/handlebars/v3
+    $ go get github.com/flowchartsman/handlebars/v4
 
 The quick and dirty way of rendering a handlebars template:
 
@@ -65,7 +65,7 @@ package main
 import (
     "fmt"
 
-    "github.com/flowchartsman/handlebars/v3"
+    "github.com/flowchartsman/handlebars/v4"
 )
 
 func main() {
@@ -115,7 +115,7 @@ package main
 import (
     "fmt"
 
-    "github.com/flowchartsman/handlebars/v3
+    "github.com/flowchartsman/handlebars/v4
 )
 
 func main() {
@@ -199,7 +199,7 @@ package main
 import (
   "fmt"
 
-  "github.com/flowchartsman/handlebars/v3
+  "github.com/flowchartsman/handlebars/v4
 )
 
 func main() {
@@ -1290,18 +1290,13 @@ These handlebars options are currently NOT implemented:
 - `knownHelpersOnly` - allows further optimizations based on the known helpers list
 - `trackIds` - include the id names used to resolve parameters for helpers
 - `noEscape` - disables HTML escaping globally
-- `strict` - templates will throw rather than silently ignore missing fields
 - `assumeObjects` - removes object existence checks when traversing paths
 - `preventIndent` - disables the auto-indententation of nested partials
 - `stringParams` - resolves a parameter to it's name if the value isn't present in the context stack
 
 These handlebars features are currently NOT implemented:
 
-- raw block content is not passed as a parameter to helper
-- `blockHelperMissing` - helper called when a helper can not be directly resolved
-- `helperMissing` - helper called when a potential helper expression was not found
 - `@contextPath` - value set in `trackIds` mode that records the lookup path for the current context
-- `@level` - log level
 
 
 ## Handlebars Lexer
@@ -1314,7 +1309,7 @@ package main
 import (
     "fmt"
 
-    "github.com/flowchartsman/handlebars/v3/lexer"
+    "github.com/flowchartsman/handlebars/v4/lexer"
 )
 
 func main() {
@@ -1356,8 +1351,8 @@ package main
 import (
     "fmt"
 
-    "github.com/flowchartsman/handlebars/v3/ast"
-    "github.com/flowchartsman/handlebars/v3/parser"
+    "github.com/flowchartsman/handlebars/v4/ast"
+    "github.com/flowchartsman/handlebars/v4/parser"
 )
 
 fu  nc main() {
