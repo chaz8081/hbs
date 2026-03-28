@@ -1,0 +1,19 @@
+{
+  "title": "My Blog",
+  "greeting": "Welcome",
+  "user": {
+    "name": "Alice",
+    "email": "alice@example.com",
+    "role": "admin"
+  },
+  "showAvatar": false,
+  "posts": [
+    {
+      "title": "First Post",
+      "body": "Hello world!",
+      "published": true,
+      "date": "2024-01-15"
+    }
+  ],
+  "copyright": "© 2024 My Blog"
+}

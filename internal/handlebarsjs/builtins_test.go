@@ -286,10 +286,17 @@ var builtinsTests = []Test{
 	// SKIP: #log - "should handle missing logger"
 
 	// @note Test added
-	// @todo Check log output
 	{
 		"#log",
 		"{{log blah}}",
+		map[string]string{"blah": "whee"},
+		nil, nil, nil,
+		"",
+	},
+	// v4: log with level hash argument
+	{
+		"#log - should support level hash argument",
+		"{{log blah level=\"warn\"}}",
 		map[string]string{"blah": "whee"},
 		nil, nil, nil,
 		"",
@@ -333,6 +340,28 @@ var builtinsTests = []Test{
 		map[string]interface{}{"goodbyes": []int{0, 1}, "data": []string{"foo", "bar"}},
 		nil, nil, nil,
 		"",
+	},
+	// v4: lookup should preserve types - object result used with #with
+	{
+		"#lookup - should preserve object type",
+		"{{#with (lookup data \"inner\")}}{{greeting}} {{noun}}{{/with}}",
+		map[string]interface{}{
+			"data": map[string]interface{}{
+				"inner": map[string]string{"greeting": "Hello", "noun": "world"},
+			},
+		},
+		nil, nil, nil,
+		"Hello world",
+	},
+	// v4: lookup returns boolean preserving truthiness
+	{
+		"#lookup - should preserve boolean type",
+		"{{#if (lookup data \"active\")}}yes{{else}}no{{/if}}",
+		map[string]interface{}{
+			"data": map[string]interface{}{"active": true},
+		},
+		nil, nil, nil,
+		"yes",
 	},
 }
 

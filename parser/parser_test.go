@@ -5,8 +5,8 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/chaz8081/handlebars-go/v3/ast"
-	"github.com/chaz8081/handlebars-go/v3/lexer"
+	"github.com/chaz8081/handlebars-go/v4/ast"
+	"github.com/chaz8081/handlebars-go/v4/lexer"
 )
 
 type parserTest struct {

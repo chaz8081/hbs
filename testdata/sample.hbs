@@ -1,0 +1,30 @@
+<html>
+<head><title>{{title}}</title></head>
+<body>
+  <h1>{{greeting}} {{user.name}}</h1>
+
+  {{#if showAvatar}}
+    <img src="{{user.avatar}}" alt="{{user.name}}">
+  {{/if}}
+
+  {{#with user}}
+    <p>Email: {{email}}</p>
+    <p>Role: {{role}}</p>
+  {{/with}}
+
+  <h2>Posts</h2>
+  {{#each posts}}
+    <article>
+      <h3>{{title}}</h3>
+      <p>{{body}}</p>
+      {{#if published}}
+        <span>Published on {{date}}</span>
+      {{/if}}
+    </article>
+  {{else}}
+    <p>No posts yet.</p>
+  {{/each}}
+
+  <footer>{{copyright}}</footer>
+</body>
+</html>

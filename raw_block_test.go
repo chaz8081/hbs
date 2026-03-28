@@ -40,3 +40,30 @@ func TestRawBlock_CustomName(t *testing.T) {
 		t.Errorf("expected '{{stuff}}', got %q", result)
 	}
 }
+
+func TestRawBlock_ContentPassedToHelper(t *testing.T) {
+	RegisterHelper("getText", func(options *Options) string {
+		return options.RawContent()
+	})
+	defer RemoveHelper("getText")
+
+	tpl := MustParse("{{{{getText}}}}{{foo}} bar{{{{/getText}}}}")
+	result := tpl.MustExec(nil)
+	if result != "{{foo}} bar" {
+		t.Errorf("expected '{{foo}} bar', got %q", result)
+	}
+}
+
+func TestRawBlock_ContentAvailableViaRawContent(t *testing.T) {
+	RegisterHelper("wrapRaw", func(options *Options) string {
+		return "<raw>" + options.RawContent() + "</raw>"
+	})
+	defer RemoveHelper("wrapRaw")
+
+	tpl := MustParse("{{{{wrapRaw}}}}hello {{world}}{{{{/wrapRaw}}}}")
+	result := tpl.MustExec(nil)
+	expected := "<raw>hello {{world}}</raw>"
+	if result != expected {
+		t.Errorf("expected %q, got %q", expected, result)
+	}
+}
