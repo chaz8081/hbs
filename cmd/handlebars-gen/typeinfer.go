@@ -4,7 +4,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/chaz8081/handlebars-go/v4/ast"
+	"github.com/chaz8081/hbs/v4/ast"
 )
 
 // fieldType represents an inferred Go type for a template variable.

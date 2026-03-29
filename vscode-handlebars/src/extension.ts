@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as cp from 'child_process';
 import * as path from 'path';
 
-const DIAGNOSTICS_SOURCE = 'handlebars-go';
+const DIAGNOSTICS_SOURCE = 'hbs';
 let diagnosticCollection: vscode.DiagnosticCollection;
 
 // Built-in helpers and their documentation

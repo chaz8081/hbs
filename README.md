@@ -1,9 +1,9 @@
-# handlebars-go
-[![Go Reference](https://pkg.go.dev/badge/github.com/chaz8081/handlebars-go.svg)](https://pkg.go.dev/github.com/chaz8081/handlebars-go/v4)
+# hbs
+[![Go Reference](https://pkg.go.dev/badge/github.com/chaz8081/hbs.svg)](https://pkg.go.dev/github.com/chaz8081/hbs/v4)
 
 Handlebars for [golang](https://golang.org) with the same features as [handlebars.js](http://handlebarsjs.com) `4.0`. Hard fork of [flowchartsman/handlebars](https://github.com/flowchartsman/handlebars) (itself a fork of [Raymond](https://github.com/aymerick/raymond)) to keep up with handlebars development.
 
-![Handlebars Logo](https://github.com/chaz8081/handlebars-go/blob/main/handlebars-gopher.png?raw=true "Handlebars")
+![Handlebars Logo](https://github.com/chaz8081/hbs/blob/main/handlebars-gopher.png?raw=true "Handlebars")
 
 
 # Table of Contents
@@ -64,7 +64,7 @@ Handlebars for [golang](https://golang.org) with the same features as [handlebar
 
 ## Quick Start
 
-    $ go get github.com/chaz8081/handlebars-go/v4
+    $ go get github.com/chaz8081/hbs/v4
 
 The quick and dirty way of rendering a handlebars template:
 
@@ -74,7 +74,7 @@ package main
 import (
     "fmt"
 
-    "github.com/chaz8081/handlebars-go/v4"
+    "github.com/chaz8081/hbs/v4"
 )
 
 func main() {
@@ -124,7 +124,7 @@ package main
 import (
     "fmt"
 
-    "github.com/chaz8081/handlebars-go/v4
+    "github.com/chaz8081/hbs/v4
 )
 
 func main() {
@@ -208,7 +208,7 @@ package main
 import (
   "fmt"
 
-  "github.com/chaz8081/handlebars-go/v4
+  "github.com/chaz8081/hbs/v4
 )
 
 func main() {
@@ -1370,9 +1370,9 @@ You can use following utility fuctions to parse and register partials from files
 This module ships with three CLI tools for working with Handlebars templates in Go projects. Install them with:
 
 ```sh
-go install github.com/chaz8081/handlebars-go/v4/cmd/handlebars-lint@latest
-go install github.com/chaz8081/handlebars-go/v4/cmd/handlebars-vars@latest
-go install github.com/chaz8081/handlebars-go/v4/cmd/handlebars-gen@latest
+go install github.com/chaz8081/hbs/v4/cmd/handlebars-lint@latest
+go install github.com/chaz8081/hbs/v4/cmd/handlebars-vars@latest
+go install github.com/chaz8081/hbs/v4/cmd/handlebars-gen@latest
 ```
 
 
@@ -1469,7 +1469,7 @@ npm install
 npm run compile
 ```
 
-Then use "Install from VSIX" or symlink into your VS Code extensions directory. See GitHub issue [#2](https://github.com/chaz8081/handlebars-go/issues/2) for marketplace publishing plans.
+Then use "Install from VSIX" or symlink into your VS Code extensions directory. See GitHub issue [#2](https://github.com/chaz8081/hbs/issues/2) for marketplace publishing plans.
 
 
 ## Mustache
@@ -1508,7 +1508,7 @@ package main
 import (
     "fmt"
 
-    "github.com/chaz8081/handlebars-go/v4/lexer"
+    "github.com/chaz8081/hbs/v4/lexer"
 )
 
 func main() {
@@ -1550,8 +1550,8 @@ package main
 import (
     "fmt"
 
-    "github.com/chaz8081/handlebars-go/v4/ast"
-    "github.com/chaz8081/handlebars-go/v4/parser"
+    "github.com/chaz8081/hbs/v4/ast"
+    "github.com/chaz8081/hbs/v4/parser"
 )
 
 fu  nc main() {

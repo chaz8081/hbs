@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/chaz8081/handlebars-go/v4"
+	"github.com/chaz8081/hbs/v4"
 )
 
 // cf. https://github.com/aymerick/go-fuzz-tests/handlebars

@@ -17,7 +17,7 @@ import (
 	"os"
 	"strings"
 
-	handlebars "github.com/chaz8081/handlebars-go/v4"
+	handlebars "github.com/chaz8081/hbs/v4"
 )
 
 type fileVars struct {
