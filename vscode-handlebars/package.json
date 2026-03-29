@@ -1,7 +1,7 @@
 {
-  "name": "handlebars-go",
+  "name": "hbs",
   "displayName": "Handlebars (Go)",
-  "description": "Handlebars template support for Go projects using chaz8081/handlebars-go",
+  "description": "Handlebars template support for Go projects using chaz8081/hbs",
   "version": "0.1.0",
   "publisher": "chaz8081",
   "engines": {
