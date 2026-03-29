@@ -1,4 +1,4 @@
-module github.com/chaz8081/handlebars-go/v4
+module github.com/chaz8081/hbs/v4
 
 go 1.16
 
