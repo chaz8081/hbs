@@ -15,14 +15,11 @@ linters:
         - "all"
         - "-QF*"
         - "-ST*"
+  exclusions:
+    rules:
+      - path: "_test\\.go"
+        linters: [errcheck]
 
 formatters:
   enable:
     - gofmt
-
-issues:
-  # Only report issues in new code on CI (via --new-from-rev flag).
-  # This avoids flagging inherited upstream code (Raymond/flowchartsman).
-  exclude-rules:
-    - path: "_test\\.go"
-      linters: [errcheck]
