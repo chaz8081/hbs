@@ -3,5 +3,8 @@
 /handlebars-lint
 /handlebars-vars
 
+# Local sandbox (not committed)
+sandbox/
+
 # Beads issue tracker (local only)
 .beads/
