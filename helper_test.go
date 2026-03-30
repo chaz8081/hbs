@@ -262,6 +262,7 @@ func TestHelperCtx(t *testing.T) {
 
 		return SafeString(result)
 	})
+	defer RemoveHelper("template")
 
 	template := `By {{ template "namefile" }}`
 	context := Author{"Alan", "Johnson"}

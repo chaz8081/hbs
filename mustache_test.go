@@ -42,6 +42,10 @@ func TestMustache(t *testing.T) {
 	skipFiles := map[string]bool{
 		// mustache lambdas differ from handlebars lambdas
 		"~lambdas.yml": true,
+		// mustache dynamic names ({{>*name}}) use different syntax than handlebars
+		"~dynamic-names.yml": true,
+		// mustache inheritance ({{<parent}}/{{$block}}) differs from handlebars partial blocks
+		"~inheritance.yml": true,
 	}
 
 	for _, fileName := range mustacheTestFiles() {
