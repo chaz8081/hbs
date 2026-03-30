@@ -2,3 +2,6 @@
 /handlebars-gen
 /handlebars-lint
 /handlebars-vars
+
+# Beads issue tracker (local only)
+.beads/
