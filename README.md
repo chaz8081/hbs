@@ -1474,28 +1474,30 @@ Then use "Install from VSIX" or symlink into your VS Code extensions directory. 
 
 ## Mustache
 
-Handlebars is a superset of [mustache](https://mustache.github.io) but it differs on those points:
+Handlebars is a superset of [mustache](https://mustache.github.io). This library passes the [mustache spec v1.4.3](https://github.com/mustache/spec) core tests (interpolation, sections, comments, inverted sections, partials, delimiters) with the following exceptions:
 
-- Alternative delimiters are not supported
-- There is no recursive lookup
+- Alternative delimiters (`{{=<% %>=}}`) are not supported
+- There is no recursive lookup (consistent with handlebars.js)
+- Lambda behavior follows handlebars.js conventions, not the mustache spec
+- Optional mustache specs not supported:
+  - Dynamic names (`{{>*dynamicName}}`) — handlebars uses subexpressions instead: `{{> (lookup . "name")}}`
+  - Inheritance (`{{<parent}}`/`{{$block}}`) — handlebars uses partial blocks instead: `{{#> partial}}`/`{{> @partial-block}}`
 
 
 ## Limitations
 
-These handlebars options are currently NOT implemented:
+All core Handlebars v4 template features are implemented: subexpressions, raw blocks, inline partials, partial blocks, `@partial-block`, decorators, block parameters, `@data` variables (`@root`, `@first`, `@last`, `@index`, `@key`), `helperMissing`/`blockHelperMissing` hooks, strict mode, chained else, dynamic partials, whitespace control, and `includeZero`.
+
+The following handlebars.js **compile options** are not implemented (these are JavaScript-specific optimizations that do not affect template syntax):
 
 - `compat` - enables recursive field lookup
-- `knownHelpers` - list of helpers that are known to exist (truthy) at template execution time
-- `knownHelpersOnly` - allows further optimizations based on the known helpers list
+- `knownHelpers` / `knownHelpersOnly` - compile-time helper optimization
 - `trackIds` - include the id names used to resolve parameters for helpers
 - `noEscape` - disables HTML escaping globally
 - `assumeObjects` - removes object existence checks when traversing paths
-- `preventIndent` - disables the auto-indententation of nested partials
-- `stringParams` - resolves a parameter to it's name if the value isn't present in the context stack
-
-These handlebars features are currently NOT implemented:
-
-- `@contextPath` - value set in `trackIds` mode that records the lookup path for the current context
+- `preventIndent` - disables the auto-indentation of nested partials
+- `stringParams` - resolves a parameter to its name if the value isn't present in the context stack
+- `@contextPath` - only available in `trackIds` mode
 
 
 ## Handlebars Lexer
@@ -1554,7 +1556,7 @@ import (
     "github.com/chaz8081/hbs/v4/parser"
 )
 
-fu  nc main() {
+func main() {
     source := "You know {{nothing}} John Snow"
 
     // parse template
