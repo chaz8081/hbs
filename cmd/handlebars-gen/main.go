@@ -18,7 +18,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -58,7 +57,7 @@ func main() {
 	// Collect files
 	var files []string
 	if *dir != "" {
-		entries, err := ioutil.ReadDir(*dir)
+		entries, err := os.ReadDir(*dir)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error reading directory: %s\n", err)
 			os.Exit(1)
@@ -147,7 +146,7 @@ func main() {
 }
 
 func processFile(path string, typeName string, helpers map[string]bool) (*templateSchema, error) {
-	source, err := ioutil.ReadFile(path)
+	source, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}

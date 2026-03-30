@@ -50,6 +50,7 @@ func ExampleSafeString() {
 	RegisterHelper("em", func() SafeString {
 		return SafeString("<em>FOO BAR</em>")
 	})
+	defer RemoveHelper("em")
 
 	tpl := MustParse("{{em}}")
 

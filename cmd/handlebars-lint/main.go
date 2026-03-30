@@ -13,7 +13,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -71,7 +70,7 @@ func main() {
 	// Load data file if provided
 	var data interface{}
 	if *dataFile != "" {
-		b, err := ioutil.ReadFile(*dataFile)
+		b, err := os.ReadFile(*dataFile)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error reading data file: %s\n", err)
 			os.Exit(1)
@@ -138,7 +137,7 @@ func main() {
 func lintFile(path string, data interface{}, helpers map[string]bool) lintResult {
 	result := lintResult{File: path, Valid: true}
 
-	source, err := ioutil.ReadFile(path)
+	source, err := os.ReadFile(path)
 	if err != nil {
 		result.Valid = false
 		result.Errors = append(result.Errors, lintError{

@@ -124,7 +124,7 @@ package main
 import (
     "fmt"
 
-    "github.com/chaz8081/hbs/v4
+    "github.com/chaz8081/hbs/v4"
 )
 
 func main() {
@@ -208,7 +208,7 @@ package main
 import (
   "fmt"
 
-  "github.com/chaz8081/hbs/v4
+  "github.com/chaz8081/hbs/v4"
 )
 
 func main() {

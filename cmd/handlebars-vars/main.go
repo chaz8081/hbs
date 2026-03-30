@@ -13,7 +13,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -105,7 +104,7 @@ func main() {
 }
 
 func extractFileVars(path string, helpers map[string]bool, requiredOnly bool) (fileVars, error) {
-	source, err := ioutil.ReadFile(path)
+	source, err := os.ReadFile(path)
 	if err != nil {
 		return fileVars{}, err
 	}

@@ -2,7 +2,7 @@ package handlebars
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"reflect"
 	"runtime"
 	"sync"
@@ -55,7 +55,7 @@ func MustParse(source string) *Template {
 
 // ParseFile reads given file and returns parsed template.
 func ParseFile(filePath string) (*Template, error) {
-	b, err := ioutil.ReadFile(filePath)
+	b, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +170,7 @@ func (tpl *Template) RegisterPartials(partials map[string]string) {
 
 // RegisterPartialFile reads given file and registers its content as a partial with given name.
 func (tpl *Template) RegisterPartialFile(filePath string, name string) error {
-	b, err := ioutil.ReadFile(filePath)
+	b, err := os.ReadFile(filePath)
 	if err != nil {
 		return err
 	}
