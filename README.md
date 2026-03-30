@@ -1,5 +1,8 @@
 # hbs
+[![CI](https://github.com/chaz8081/hbs/actions/workflows/ci.yml/badge.svg)](https://github.com/chaz8081/hbs/actions/workflows/ci.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/chaz8081/hbs.svg)](https://pkg.go.dev/github.com/chaz8081/hbs/v4)
+[![Go Report Card](https://goreportcard.com/badge/github.com/chaz8081/hbs/v4)](https://goreportcard.com/report/github.com/chaz8081/hbs/v4)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 Handlebars for [golang](https://golang.org) with the same features as [handlebars.js](http://handlebarsjs.com) `4.0`. Hard fork of [flowchartsman/handlebars](https://github.com/flowchartsman/handlebars) (itself a fork of [Raymond](https://github.com/aymerick/raymond)) to keep up with handlebars development.
 
